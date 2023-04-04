@@ -9,102 +9,93 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from tkinter import Tk
 from bs4 import BeautifulSoup
-
+import re
+from dotenv import load_dotenv
+# Load the environment variables from .env file
+load_dotenv()
+# Get the username and password from environment variables
+username = os.getenv("USERNAME1")
+password = os.getenv("PASSWORD")
+print(username, password)
 # Get the screen width using the Tkinter module
 root = Tk()
 screen_width = root.winfo_screenwidth()
 root.destroy()
 chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--ignore-ssl-errors')
+chrome_options.add_argument("--incognito")
 # Set the option to keep the browser window open after the driver is closed
 chrome_options.add_experimental_option("detach", True)
-# Replace these values with your login information
-username = "thanhnguyen@mobcec.com"
-password = "0967614208nN@"
-# Set up the Selenium webdriver (make sure to replace the path with the location of your webdriver)
-chrome_driver_path = os.path.abspath("C:/bin/chromedriver.exe")
 # Create a Service object with the path to the ChromeDriver executable
+chrome_driver_path = os.path.abspath("C:/bin/chromedriver.exe")
 service = Service(executable_path=chrome_driver_path)
 driver = webdriver.Chrome(service=service, options=chrome_options)
 driver.set_window_size(screen_width, 1080)
-# Navigate to the login page
-driver.get("https://www.paycec.com/dashboard/login")
-# Find the username and password fields and enter your login information
-username_field = driver.find_element(By.ID, "email")
-username_field.send_keys(username)
-password_field = driver.find_element(By.ID, "password")
-password_field.send_keys(password)
-# Submit the login form
-submit_button = driver.find_element(By.ID, "btn-login")
-submit_button.click()
-
-# input_article_name, src_textarea_content
 
 
-def input_faq(faq_type_option):
+def login_dashboard(username, password, dashboard_url):
+    # Navigate to the login page
+    driver.get(dashboard_url)
+    # Find the username and password fields and enter your login information
+    username_field = driver.find_element(By.ID, "email")
+    username_field.send_keys(username)
+    password_field = driver.find_element(By.ID, "password")
+    password_field.send_keys(password)
+    # Submit the login form
+    time.sleep(1)
+    submit_button = driver.find_element(By.ID, "btn-login")
+    submit_button.click()
+    # input_article_name, src_textarea_content
+
+
+def process_faqs():
+    content = ''
+    try:
+        with open('file.txt', 'r', encoding='utf-8') as file:
+            content = file.read()
+    except FileNotFoundError:
+        print("File not found")
+    # Regular expression to match content inside <h2></h2> tags, including newlines
+    pattern = re.compile(r"<h2>(.*?)</h2>", re.DOTALL)
+    # List comprehension to split the string into two lists
+    h2_list = [match.group(1) for match in pattern.finditer(content)]
+    non_h2_list = [item.strip()
+                   for item in re.split(pattern, content) if item.strip()]
+    # List comprehension to split the string into two lists
+    h2_list = [match.group(1) for match in pattern.finditer(content)]
+    non_h2_list = [item.strip()
+                   for item in re.split(pattern, content) if item.strip()]
+    # Remove duplicate whitespace and newline characters from both lists
+    h2_list = [' '.join(item.split()) for item in h2_list]
+    non_h2_list = [' '.join(item.split()) for item in non_h2_list]
+    non_h2_list = non_h2_list[1:]  # remove first item
+    non_h2_list = [x for x in non_h2_list if x not in h2_list]
+    return remove_sequence(h2_list), non_h2_list
+
+
+def input_faq(faq_type_option, faq_name, faq_content):
     add_new_article = driver.find_element(By.ID, "create_article")
     add_new_article.click()
-
+    time.sleep(1)
     # Locate the dropdown menu element
-    dropdown_menu = WebDriverWait(driver, 10).until(
+    typeFaq = WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.ID, 'slcType')))
     # find the option with visible text containing "Google Pay"
+    typeOption = typeFaq.find_element(By.XPATH,
+                                      "//option[contains(text(),'" + faq_type_option + "')]")
+    typeOption.click()
+    nameFaq = driver.find_element(By.ID, "txtName")
+    # name
+    nameFaq.send_keys(faq_name)
+    time.sleep(3)
+    nameFaq.send_keys(Keys.TAB)
+    contentFaq = driver.find_element(By.ID, "txtContent")
+    contentFaq.send_keys(faq_content)
 
-    option = dropdown_menu.find_element(By.XPATH,
-                                        "//option[contains(text(),'" + faq_type_option + "')]")
-
-    option.click()
-
-
-# wait for the search box to appear and enter the search term
-# search_box = WebDriverWait(driver, 10).until(
-#     EC.visibility_of_element_located(
-#         (By.CSS_SELECTOR, '.select2-search textarea'))
-# )
-# search_box.send_keys('Google Pay')
-
-# wait for the "Google Pay" option to appear and click on it
-# google_pay_option = WebDriverWait(driver, 10).until(
-#     EC.visibility_of_element_located(
-#         (By.XPATH, "//li[text()='Google Pay']"))
-# )
-# google_pay_option.click()
-
-# type_id_dropdown.click()
-# Select FAQs option
-# faq_type = driver.find_element(By.ID, "select_type_chzn_o_3")
-# faq_type.click()
-# country_dropdown = driver.find_element(By.ID, "select_country_chzn")
-# country_dropdown.click()
-# # Select FAQs option
-# country_id = driver.find_element(By.ID, "select_country_chzn_o_249")
-# country_id.click()
-# driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-# wait = WebDriverWait(driver, 10)
-# iframe = WebDriverWait(driver, 10).until(
-#     EC.visibility_of_element_located((By.ID, "content___Frame"))
-# )
-# driver.switch_to.frame(iframe)
-# # Wait for the TB_Button_Text element to be clickable and click it
-# change_src_button = wait.until(
-#     EC.element_to_be_clickable(
-#         (By.XPATH, "//div[@title='Source' and @class='TB_Button_Off']")
-#     )
-# )
-# change_src_button.click()
-# src_textarea = wait.until(
-#     EC.element_to_be_clickable((By.CLASS_NAME, "SourceField"))
-# )
-# src_textarea.clear()
-# src_textarea.send_keys(src_textarea_content)
-# # Switch back to the main content
-# driver.switch_to.default_content()
-# submit_button = wait.until(
-#     EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']"))
-# )
-# submit_button.click()
-# time.sleep(3)
-
-
+    submitForm = driver.find_element(By.ID,
+                                     "submit_create")
+    submitForm.click()
 # def input_articles(input_article_name, src_textarea_content):
 #     article_name_input = driver.find_element(By.ID, "txt_article")
 #     article_name_input.send_keys("Vietnam")
@@ -195,16 +186,50 @@ def input_faq(faq_type_option):
 #     content_textarea.send_keys(html_articles_content)
 
 
+def remove_sequence(list):
+    new_list = []
+    for item in list:
+
+        new_item = item.split('. ')[-1]
+        new_list.append(new_item)
+    return new_list
+
+
+def process_doc(username, password):
+
+    driver.get('https://accounts.google.com/ServiceLogin?'
+               'service=wise&passive=1209600&continue='
+               'https://drive.google.com/&followup=https://'
+               'drive.google.com/&ltmpl=drive')
+    username_field = driver.find_element(By.NAME, 'identifier')
+    username_field.send_keys(username)
+    username_field.send_keys(Keys.RETURN)
+    driver.implicitly_wait(10)
+    password_field = driver.find_element(By.NAME, 'Passwd')
+    password_field.send_keys(password)
+    password_field.send_keys(Keys.RETURN)
+    driver.implicitly_wait(10)
+    driver.get(
+        'https://docs.google.com/document/d/1QC8zhagXpM9Gk5-a90aUuVcy1Zvs4QUbK4PERiu7Aog/edit')
+    content = driver.page_source
+    print(content)
+
+
 def main():
-    # with open('articles-name.txt', 'r') as articles_name_file:
-    #     articles_name_list = [line.strip() for line in articles_name_file.readlines()]
-    # articles_name_file.close()
-    # with open('articles-content.txt', 'r') as articles_content_file:
-    #     articles_content_list = [line.strip() for line in articles_content_file.readlines()]
-    # articles_content_file.close()
-    # for index in range(len(articles_name_list)):
-    #     input_faq(articles_name_list[index], articles_content_list[index])
-    input_faq('Google Pay')
+    # username = 'thanhnguyen@mobcec.com'
+    # password = '0967614208nN@'
+    # dashboard_url = 'https://www.paycec.com/dashboard/login'
+    # login_dashboard(username, password, dashboard_url)
+
+    # faq = process_faqs()
+    # faq_name = faq[0]
+    # faq_content = faq[1]
+    # faq_type = 'Amex'
+
+    # for i in range(len(faq_name)):
+    #     # for each item name/content -> create a new article
+    #     input_faq(faq_type, faq_name[i], faq_content[i])
+    process_doc(username, password)
 
 
 if __name__ == "__main__":
