@@ -44,9 +44,10 @@ def login_dashboard(username, password, dashboard_url):
     password_field = driver.find_element(By.ID, "password")
     password_field.send_keys(password)
     # Submit the login form
-    time.sleep(5)
+    time.sleep(3)
     # submit_button = driver.find_element(By.ID, "btn-login")
     submit_button = driver.find_element(By.CLASS_NAME, "submit")
+    # submit_button = driver.find_element(By.ID, "btn-login")
     submit_button.click()
     # input_article_name, src_textarea_content
 
@@ -60,8 +61,14 @@ def process_faqs():
         print("File not found")
     # Regular expression to match content inside <h2></h2> tags, including newlines
     pattern = re.compile(r"<h2>(.*?)</h2>", re.DOTALL)
-    # List comprehension to split the string into two lists
-    h2_list = [match.group(1) for match in pattern.finditer(content)]
+    # Remove all <strong> tags inside <h2> tags
+
+    def remove_strong_tags(match):
+        return re.sub(r"<strong>(.*?)</strong>", r"\1", match.group(1))
+    # List comprehension to extract content inside <h2> tags and remove <strong> tags
+    h2_list = [remove_strong_tags(match)
+               for match in pattern.finditer(content)]
+    # List comprehension to split the string into two lists: content inside and outside <h2> tags
     non_h2_list = [item.strip()
                    for item in re.split(pattern, content) if item.strip()]
     # List comprehension to split the string into two lists
@@ -76,7 +83,7 @@ def process_faqs():
     return remove_sequence(h2_list), non_h2_list
 
 
-def input_faq(faq_type_option, faq_name, faq_content):
+def input_faq(faq_name, faq_content, faq_type):
     add_new_article = driver.find_element(By.ID, "create_article")
     add_new_article.click()
     time.sleep(1)
@@ -85,7 +92,7 @@ def input_faq(faq_type_option, faq_name, faq_content):
         EC.visibility_of_element_located((By.ID, 'slcType')))
     # find the option with visible text containing "Google Pay"
     typeOption = typeFaq.find_element(By.XPATH,
-                                      "//option[contains(text(),'" + faq_type_option + "')]")
+                                      "//option[contains(text()," + faq_type + ")]")
     typeOption.click()
     nameFaq = driver.find_element(By.ID, "txtName")
     # name
@@ -100,33 +107,47 @@ def input_faq(faq_type_option, faq_name, faq_content):
     submitForm.click()
 
 
-def input_faq_papmall(faq_type_option, faq_name, faq_content):
-    add_new_article = driver.find_element(By.ID, "create_article")
+def input_faq_papmall(faq_name, faq_content, faq_order):
+    add_new_article = driver.find_element(
+        By.CLASS_NAME, "ui-icon.ui-icon-plus")
     add_new_article.click()
     time.sleep(1)
-    # Locate the dropdown menu element
-    typeFaq = WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.ID, 'faq_type_id')))
-    # find the option with visible text containing "Google Pay"
-    typeOption = typeFaq.select_by_visible_text("AR Filters lenses")
+    # papCategoryID = WebDriverWait(driver, 10).until(
+    #     EC.visibility_of_element_located((By.ID, 'faq_pap_category_id')))
+    # papCategoryID = driver.find_element(By.ID, "faq_pap_category_id")
+    # papCategoryID.select_by_visible_text('AR Filters')
+    papCategoryID = driver.find_element(
+        By.CSS_SELECTOR, '#faq_pap_category_id + .select2')
+    papCategoryID.click()
+    wait = WebDriverWait(driver, 3)
+    papCategoryIDSearchField = driver.find_element(
+        By.CLASS_NAME, "select2-search__field")
+    papCategoryIDSearchField.send_keys('AR Filters')
+    papCategoryIDSearchField.send_keys(Keys.ENTER)
 
     nameFaq = driver.find_element(By.ID, "faq_name")
-    # name
     nameFaq.send_keys(faq_name)
     time.sleep(3)
     nameFaq.send_keys(Keys.TAB)
-
     # todo: input content into the content iframe file, choose the order from 1 => 6 for each the input
     # question by order and choose faq active = 'active' => click submit button
-    contentFaq = driver.find_element(By.ID, "txtContent")
-    contentFaq.send_keys(faq_content)
-
-    submitForm = driver.find_element(By.ID,
-                                     "submit_create")
-    submitForm.click()
-
-    # Select the option with the text "AR Filters lenses"
-    dropdown.select_by_visible_text("AR Filters lenses")
+    sourceBtn = driver.find_element(By.ID, "cke_35")
+    sourceBtn.click()
+    # Locate the textarea element by its class name
+    faqContentTextarea = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.CLASS_NAME, 'cke_source')))
+    # Send keys to the textarea element
+    faqContentTextarea.send_keys(faq_content)
+    faqOrderInput = driver.find_element(By.ID, "faq_order")
+    faqOrderInput.send_keys(faq_order)
+    # Locate the span element by its ID
+    faq_active_span = driver.find_element(By.ID, "faq_active")
+    # Locate the input element with ID "active" under the faq_active_span
+    active_input_element = faq_active_span.find_element(By.ID, "active")
+    # Click on the active input element (or perform any other action on it)
+    active_input_element.click()
+    submitBtn = driver.find_element(By.ID, 'sData')
+    submitBtn.click()
 
 
 def input_articles(input_article_name, src_textarea_content):
@@ -243,20 +264,32 @@ def process_doc():
     print(content)
 
 
-def main():
-    # with open('articles-name.txt', 'r') as articles_name_file:
-    #     articles_name_list = [line.strip() for line in articles_name_file.readlines()]
-    # articles_name_file.close()
-    # with open('articles-content.txt', 'r') as articles_content_file:
-    #     articles_content_list = [line.strip() for line in articles_content_file.readlines()]
-    # articles_content_file.close()
-    # for index in range(len(articles_name_list)):
-    #     input_faq(articles_name_list[index], articles_content_list[index])
-    # dashboard_url = 'https://backoffice.papmall.com/login'
-    # login_dashboard(username, password, dashboard_url)
-    output1 = process_faqs()
-    print(output1[0])
+# def main():
+#     # with open('articles-name.txt', 'r') as articles_name_file:
+#     #     articles_name_list = [line.strip() for line in articles_name_file.readlines()]
+#     # articles_name_file.close()
+#     # with open('articles-content.txt', 'r') as articles_content_file:
+#     #     articles_content_list = [line.strip() for line in articles_content_file.readlines()]
+#     # articles_content_file.close()
+#     # Input FAQs for Paycec
+#     # dashboard_url = 'https://www.paycec.com/dashboard/login'
+#     # login_dashboard(username, password, dashboard_url)
+#     # faq_name = process_faqs()[0]
+#     # faq_content = process_faqs()[1]
+#     # for i in range(len(process_faqs()[0])):
+#     #     input_faq(faq_name[i], faq_content[i])
+#     # Input FAQs for papmall
+#     dashboard_url = 'https://backoffice.papmall.com/login'
+#     login_dashboard(username, password, dashboard_url)
+#     time.sleep(1)
+#     driver.get('https://backoffice.papmall.com/common/papmall_faq_article')
+#     # scroll to bottom of page
+#     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+#     faq_name = process_faqs()[0]
+#     faq_content = process_faqs()[1]
+#     for i in range(len(process_faqs()[0])):
+#         input_faq_papmall(faq_name[i], faq_content[i], i)
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
