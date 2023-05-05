@@ -10,12 +10,7 @@ from selenium.webdriver.common.keys import Keys
 from tkinter import Tk
 from bs4 import BeautifulSoup
 import re
-from dotenv import load_dotenv
-# Load the environment variables from .env file
-load_dotenv()
-# Get the username and password from environment variables
-username = os.getenv("USERNAME1")
-password = os.getenv("PASSWORD")
+
 # Get the screen width using the Tkinter module
 root = Tk()
 screen_width = root.winfo_screenwidth()
@@ -27,13 +22,13 @@ chrome_options.add_argument("--incognito")
 chrome_options.add_argument("Chrome/111.0.0.0")
 # Set the option to keep the browser window open after the driver is closed
 chrome_options.add_experimental_option("detach", True)
+chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 # Create a Service object with the path to the ChromeDriver executable
 chrome_driver_path = os.path.abspath("C:/bin/chromedriver.exe")
 # Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36
 service = Service(executable_path=chrome_driver_path)
 driver = webdriver.Chrome(service=service, options=chrome_options)
 driver.set_window_size(screen_width, 1080)
-
 
 def login_dashboard(username, password, dashboard_url):
     # Navigate to the login page
@@ -46,41 +41,10 @@ def login_dashboard(username, password, dashboard_url):
     # Submit the login form
     time.sleep(3)
     # submit_button = driver.find_element(By.ID, "btn-login")
-    submit_button = driver.find_element(By.CLASS_NAME, "submit")
-    # submit_button = driver.find_element(By.ID, "btn-login")
+    # submit_button = driver.find_element(By.CLASS_NAME, "submit")
+    submit_button = driver.find_element(By.ID, "btn-login")
     submit_button.click()
     # input_article_name, src_textarea_content
-
-
-def process_faqs():
-    content = ''
-    try:
-        with open('file.txt', 'r', encoding='utf-8') as file:
-            content = file.read()
-    except FileNotFoundError:
-        print("File not found")
-    # Regular expression to match content inside <h2></h2> tags, including newlines
-    pattern = re.compile(r"<h2>(.*?)</h2>", re.DOTALL)
-    # Remove all <strong> tags inside <h2> tags
-
-    def remove_strong_tags(match):
-        return re.sub(r"<strong>(.*?)</strong>", r"\1", match.group(1))
-    # List comprehension to extract content inside <h2> tags and remove <strong> tags
-    h2_list = [remove_strong_tags(match)
-               for match in pattern.finditer(content)]
-    # List comprehension to split the string into two lists: content inside and outside <h2> tags
-    non_h2_list = [item.strip()
-                   for item in re.split(pattern, content) if item.strip()]
-    # List comprehension to split the string into two lists
-    h2_list = [match.group(1) for match in pattern.finditer(content)]
-    non_h2_list = [item.strip()
-                   for item in re.split(pattern, content) if item.strip()]
-    # Remove duplicate whitespace and newline characters from both lists
-    h2_list = [' '.join(item.split()) for item in h2_list]
-    non_h2_list = [' '.join(item.split()) for item in non_h2_list]
-    non_h2_list = non_h2_list[1:]  # remove first item
-    non_h2_list = [x for x in non_h2_list if x not in h2_list]
-    return remove_sequence(h2_list), non_h2_list
 
 
 def input_faq(faq_name, faq_content, faq_type):
@@ -91,8 +55,10 @@ def input_faq(faq_name, faq_content, faq_type):
     typeFaq = WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.ID, 'slcType')))
     # find the option with visible text containing "Google Pay"
-    typeOption = typeFaq.find_element(By.XPATH,
-                                      "//option[contains(text()," + faq_type + ")]")
+    # typeOption = typeFaq.find_element(
+    #     By.XPATH, "//option[contains(text(),'" + faq_type + "')]")
+    typeOption = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.XPATH, "//option[contains(text(),'" + faq_type + "')]")))
     typeOption.click()
     nameFaq = driver.find_element(By.ID, "txtName")
     # name
@@ -240,15 +206,6 @@ def input_articles(input_article_name, src_textarea_content):
     content_textarea.send_keys(html_articles_content)
 
 
-def remove_sequence(list):
-    new_list = []
-    for item in list:
-
-        new_item = item.split('. ')[-1]
-        new_list.append(new_item)
-    return new_list
-
-
 def process_doc():
     driver.get(
         'https://docs.google.com/document/d/1QC8zhagXpM9Gk5-a90aUuVcy1Zvs4QUbK4PERiu7Aog/edit')
@@ -263,33 +220,3 @@ def process_doc():
     content = driver.page_source
     print(content)
 
-
-# def main():
-#     # with open('articles-name.txt', 'r') as articles_name_file:
-#     #     articles_name_list = [line.strip() for line in articles_name_file.readlines()]
-#     # articles_name_file.close()
-#     # with open('articles-content.txt', 'r') as articles_content_file:
-#     #     articles_content_list = [line.strip() for line in articles_content_file.readlines()]
-#     # articles_content_file.close()
-#     # Input FAQs for Paycec
-#     # dashboard_url = 'https://www.paycec.com/dashboard/login'
-#     # login_dashboard(username, password, dashboard_url)
-#     # faq_name = process_faqs()[0]
-#     # faq_content = process_faqs()[1]
-#     # for i in range(len(process_faqs()[0])):
-#     #     input_faq(faq_name[i], faq_content[i])
-#     # Input FAQs for papmall
-#     dashboard_url = 'https://backoffice.papmall.com/login'
-#     login_dashboard(username, password, dashboard_url)
-#     time.sleep(1)
-#     driver.get('https://backoffice.papmall.com/common/papmall_faq_article')
-#     # scroll to bottom of page
-#     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-#     faq_name = process_faqs()[0]
-#     faq_content = process_faqs()[1]
-#     for i in range(len(process_faqs()[0])):
-#         input_faq_papmall(faq_name[i], faq_content[i], i)
-
-
-# if __name__ == "__main__":
-#     main()
