@@ -143,7 +143,6 @@ def read_file_html(filename):
         print("File not found")
     return content
 
-
 def process_faqs(filename):
     content = read_file_html(filename)
     # Regular expression to match content inside <h2></h2> tags, including newlines
