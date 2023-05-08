@@ -25,5 +25,5 @@ def get_faqs_links(num_of_faqs):
 def get_dashboard_links(num_of_faqs):
     # get all dashboard link faq
     edit_btn = driver.find_elements(By.CSS_SELECTOR,".btn.btn-info")
-    for i in range(num_of_faqs - 1, 0, -1):
+    for i in range(num_of_faqs - 1, -1, -1):
         print(edit_btn[i].get_attribute("href"))
