@@ -27,7 +27,7 @@ class PaycecReadFile:
     def read_file_html(filename):
         content = ''
         try:
-            with open(filename, 'r', encoding='ISO-8859-1') as file:
+            with open(filename, 'r', encoding='utf-8') as file:
                 content = file.read()
         except FileNotFoundError:
             print("File not found")

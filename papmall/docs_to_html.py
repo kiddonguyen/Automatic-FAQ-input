@@ -24,7 +24,6 @@ SERVICE_ACCOUNT_FILE = "./service_account_key.json"
 DOCUMENT_URL = 'https://docs.google.com/document/d/1dywOFu1tkCGlF6f_qaOQwbIqeOE6Fi3RMUUWneF9Cqo/edit'
 DOCUMENT_ID = re.search(r'/document/d/([\w-]+)/', DOCUMENT_URL).group(1)
 
-
 def get_google_doc_contents():
     credentials = service_account.Credentials.from_service_account_file(
         SERVICE_ACCOUNT_FILE, scopes=SCOPES)
@@ -137,7 +136,7 @@ def process_html(html: str) -> str:
 def read_file_html(filename):
     content = ''
     try:
-        with open(filename, 'r', encoding='ISO-8859-1') as file:
+        with open(filename, 'r', encoding='utf-8') as file:
             content = file.read()
     except FileNotFoundError:
         print("File not found")

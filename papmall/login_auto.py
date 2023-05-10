@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import re
+import time
 # Get the screen width using the Tkinter module
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('--ignore-certificate-errors')
@@ -210,4 +211,3 @@ def process_doc():
     driver.implicitly_wait(10)
     content = driver.page_source
     print(content)
-

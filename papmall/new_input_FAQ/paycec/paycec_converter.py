@@ -93,3 +93,4 @@ class PaycecConverter:
         content_div = soup.find('div', id='content')
         content_html = str(content_div)
         return content_html
+        

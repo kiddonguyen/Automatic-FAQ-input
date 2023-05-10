@@ -1,6 +1,7 @@
 import paycec.constants as const
 from paycec.paycec_converter import PaycecConverter
 import os
+from paycec.paycec_optimized_images import PaycecOptimizedImages
 from selenium import webdriver
 from selenium.webdriver.common.by import By  # Import the By class
 from selenium.webdriver.chrome.service import Service
@@ -64,3 +65,6 @@ class Paycec(webdriver.Chrome):
     def convert_html(self):
         convert = PaycecConverter(driver=self)
         convert.process_html()
+    def optimize_image(self):
+        optimizer = PaycecOptimizedImages(driver=self)
+        optimizer.save_for_web()
