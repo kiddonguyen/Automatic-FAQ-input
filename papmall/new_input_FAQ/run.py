@@ -3,11 +3,16 @@ import os
 import time
 try:
     with Paycec() as bot:
-        # bot.land_first_page()
-        # bot.login_dashboard()
-        # bot.convert_html()
-        # time.sleep(5)
+        bot.land_first_page()
+        bot.login_dashboard()
+        # function to optimize the original images that good for SEO content and website performance
         bot.optimize_image()
+        # function to convert a doc link into html format
+        # bot.convert_html()
+        # function to upload html format into each faqs into dashboard
+        # bot.upload_faqs()
+        # Upload all the images in the img_optimized into paycec upload file
+        bot.upload_images()
 except Exception as e:
     if 'in PATH' in str(e):
         print(

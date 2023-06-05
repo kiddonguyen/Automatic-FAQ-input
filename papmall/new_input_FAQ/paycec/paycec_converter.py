@@ -2,18 +2,19 @@
 #That will be responsible to interact convert
 #HTML from google docs file and output into text file.
 from selenium.webdriver.remote.webdriver import WebDriver
-from dotenv import load_dotenv
-import re
-from bs4 import BeautifulSoup
-from tkinter import Tk
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By  # Import the By class
+from selenium.webdriver.common.by import By
 from selenium import webdriver
+
 import time
+import re
+from dotenv import load_dotenv
+from bs4 import BeautifulSoup
+from tkinter import Tk
 from bs4 import BeautifulSoup, Tag
 from typing import List
 from googleapiclient.errors import HttpError
@@ -21,12 +22,16 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 import pypandoc
 import pandocfilters as pf
+import paycec.constants as const
+
 class PaycecConverter:
     def __init__(self, driver:WebDriver):
         self.driver = driver
     def get_google_doc_contents(self):
+        DOCUMENT_ID = re.search(
+            r'/document/d/([\w-]+)/', const.DOCUMENT_URL).group(1)
         credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        const.SERVICE_ACCOUNT_FILE, scopes=const.SCOPES)
         service = build('docs', 'v1', credentials=credentials)
         doc = service.documents().get(documentId=DOCUMENT_ID).execute()
         content = doc.get('body').get('content')
@@ -73,8 +78,8 @@ class PaycecConverter:
         html = pypandoc.convert_text(
         markdown, 'html', format='md')
         return html
-    def process_html(self):
-        html = self.get_google_doc_contents()
+    def process_html(self, html):
+        # html = self.get_google_doc_contents()
         soup = BeautifulSoup(html, 'html.parser')
         for ol_tag in soup.find_all('ol'):
             li_tag = ol_tag.find('li')
@@ -93,4 +98,11 @@ class PaycecConverter:
         content_div = soup.find('div', id='content')
         content_html = str(content_div)
         return content_html
-        
+
+    def convert_to_html(self, markdown):
+        html = pypandoc.convert_text(
+            markdown, 'html', format='md')
+        # Replace the plain <a> tags with ones with title and target attributes
+        # html = re.sub(r'<a href="(.*?)">(.*?)</a>', link_replace, html)
+        return html
+    
