@@ -6,7 +6,8 @@ try:
         bot.land_first_page()
         bot.login_dashboard()
         # function to optimize the original images that good for SEO content and website performance
-        bot.optimize_image()
+        # parem icon_img_pos: position of the icon image that the meta with inherit title name
+        bot.optimize_image(0)
         # function to convert a doc link into html format
         # bot.convert_html()
         # function to upload html format into each faqs into dashboard

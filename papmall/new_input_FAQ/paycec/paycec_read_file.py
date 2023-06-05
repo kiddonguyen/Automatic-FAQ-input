@@ -77,47 +77,47 @@ class PaycecReadFile:
         for i in range(num_of_faqs - 1, -1, -1):
             print(edit_btn[i].get_attribute("href"))
 
-    # def upload_files(self):
-    #     self.driver.get('https://www.paycec.com/dashboard/cloud-upload')
-    #     file_input = self.driver.find_element(By.ID, 'upload-files')
-    #     # Get the list of image files from the "img_optimized" folder
-    #     image_files = [filename for filename in os.listdir(
-    #         'img_optimized') if filename.endswith(('.jpg', '.png', '.jpeg'))]
+    def upload_files(self):
+        self.driver.get('https://www.paycec.com/dashboard/cloud-upload')
+        file_input = self.driver.find_element(By.ID, 'upload-files')
+        # Get the list of image files from the "img_optimized" folder
+        image_files = [filename for filename in os.listdir(
+            'img_optimized') if filename.endswith(('.jpg', '.png', '.jpeg'))]
 
-    #     # Upload files
-    #     for file_name in image_files:
-    #         file_path = os.path.abspath(os.path.join('img_optimized', file_name))
-    #         file_input.send_keys(file_path)
+        # Upload files
+        for file_name in image_files:
+            file_path = os.path.abspath(os.path.join('img_optimized', file_name))
+            file_input.send_keys(file_path)
 
-    #     # Submit the form
-    #     upload_button = self.driver.find_element(By.CLASS_NAME, 'btn-primary')
-    #     upload_button.click()
+        # Submit the form
+        upload_button = self.driver.find_element(By.CLASS_NAME, 'btn-primary')
+        upload_button.click()
 
-    #     # Wait for the upload to complete and check the success message
-    #     success_message_locator = (By.ID, 'order-form-message')
-    #     WebDriverWait(self.driver, 10).until(EC.text_to_be_present_in_element(
-    #         success_message_locator, 'All files are uploaded successfully!'))
+        # Wait for the upload to complete and check the success message
+        success_message_locator = (By.ID, 'order-form-message')
+        WebDriverWait(self.driver, 10).until(EC.text_to_be_present_in_element(
+            success_message_locator, 'All files are uploaded successfully!'))
 
-    #     print('Files uploaded successfully!')
+        print('Files uploaded successfully!')
 
-    #     # Extract the href values from the uploaded images
-    #     uploaded_image_links = []
-    #     success_message_divs = self.driver.find_elements(
-    #         By.CLASS_NAME, 'alert-success')
-    #     for success_message_div in success_message_divs:
-    #         soup = BeautifulSoup(success_message_div.get_attribute(
-    #             'innerHTML'), 'html.parser')
-    #         link_tags = soup.find_all('a')
-    #         for link_tag in link_tags:
-    #             href = link_tag['href']
-    #             uploaded_image_links.append(href)
+        # Extract the href values from the uploaded images
+        uploaded_image_links = []
+        success_message_divs = self.driver.find_elements(
+            By.CLASS_NAME, 'alert-success')
+        for success_message_div in success_message_divs:
+            soup = BeautifulSoup(success_message_div.get_attribute(
+                'innerHTML'), 'html.parser')
+            link_tags = soup.find_all('a')
+            for link_tag in link_tags:
+                href = link_tag['href']
+                uploaded_image_links.append(href)
 
-    #     # Print the uploaded image links
-    #     print('Uploaded Image Links:')
-    #     for link in uploaded_image_links:
-    #         if '-meta' not in link:
-    #             print(link)
-    #     return uploaded_image_links
+        # Print the uploaded image links
+        print('Uploaded Image Links:')
+        for link in uploaded_image_links:
+            if '-meta' not in link:
+                print(link)
+        return uploaded_image_links
 
     def update_image_links(self, output_file):
         content = self.read_file_html(output_file)

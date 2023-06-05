@@ -78,11 +78,11 @@ class Paycec(webdriver.Chrome):
         with open(file_name, "w", encoding='utf-8') as file:
             file.write(html)
    
-    def optimize_image(self):
+    def optimize_image(self, icon_img_pos):
         optimizer = PaycecOptimizedImages(driver=self)
         optimizer.save_for_web()
         file_path = 'output.txt'
-
+        # icon_img_pos =
         with open(file_path, 'r') as file:
             contents = file.read()
 
@@ -98,7 +98,7 @@ class Paycec(webdriver.Chrome):
 
         # Remove stopwords from the image titles and slugify
         image_titles = [slugify(optimizer.check_stopwords(title)) for title in image_titles]
-
+        print(image_titles)
 
         # Get the list of image files in the img_optimized folder
         image_files = [filename for filename in os.listdir(
@@ -107,7 +107,13 @@ class Paycec(webdriver.Chrome):
         # Rename the image files based on the extracted titles
         for i, filename in enumerate(image_files):
             original_title, extension = os.path.splitext(filename)
-            new_title = image_titles[i]
+            
+            if (i == icon_img_pos):
+                new_title = image_titles[icon_img_pos]
+                i -= 1
+                print(new_title)
+            else:
+                new_title = image_titles[i]
 
             # Check if the original filename contains "-meta"
             if "-meta" in original_title:
