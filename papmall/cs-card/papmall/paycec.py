@@ -18,27 +18,15 @@ from urllib.parse import urlparse
 import time
 from bs4 import BeautifulSoup
 from slugify import slugify
-
-
-
-
-# from django.utils.text import slugify
 class Paycec(webdriver.Chrome):
     def __init__(self, driver_path=r"C:\bin"):
         self.driver_path = driver_path
-        # self.teardown = teardowns
         os.environ['PATH'] += self.driver_path
         options = webdriver.ChromeOptions()
         # options.add_experimental_option('excludeSwitches', ['enable-logging'])
         super(Paycec, self).__init__(options=options)
         self.implicitly_wait(30)
         self.maximize_window()
-
-    # Error function exit, modify later
-    # def __exit__(self, exc_type, exc_val, exc_tb):
-    #     if self.teardown:
-    #         self.quit()
-
     def land_first_page(self):
         self.get(const.BASE_URL)
     

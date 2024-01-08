@@ -8,6 +8,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import re
 import time
+
+# test from here
+from selenium.webdriver.common.action_chains import ActionChains
+
+
 # Get the screen width using the Tkinter module
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('--ignore-certificate-errors')
