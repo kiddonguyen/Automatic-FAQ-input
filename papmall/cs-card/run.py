@@ -5,15 +5,10 @@ try:
     with Paycec() as bot:
         bot.land_first_page()
         bot.login_dashboard()
-        # function to optimize the original images that good for SEO content and website performance
-        # parem icon_img_pos: position of the icon image that the meta with inherit title name
-        # bot.optimize_image(0)
-        # function to convert a doc link into html format
-        # bot.convert_html()
-        # function to upload html format into each faqs into dashboard
+        bot.redirect_blog()
+        bot.add_blog_post()
         bot.upload_faqs()
-        # Upload all the images in the img_optimized into paycec upload file
-        # bot.upload_images()
+        time.sleep(5)
 except Exception as e:
     if 'in PATH' in str(e):
         print(
